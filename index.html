@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>David Picture Pro - Détecteur Congo</title>
+<style>
+body{font-family:sans-serif;background:#f0f2f5;padding:20px;max-width:500px;margin:auto}
+.card{background:white;padding:20px;border-radius:15px;box-shadow:0 4px 10px rgba(0,0,0,0.1)}
+input{width:100%;padding:15px;border-radius:10px;border:2px solid #0077ff;margin:10px 0}
+button{width:100%;padding:15px;background:#0077ff;color:white;border:none;border-radius:10px;font-weight:bold;font-size:16px}
+.result{margin-top:20px;padding:15px;border-radius:10px;display:none}
+.yellow{background:#fff3cd} .green{background:#d4edda} .orange{background:#ffe0b2}
+.contact{margin-top:20px;font-size:12px;text-align:center;color:gray}
+</style>
+</head>
+<body>
+<div class="card">
+<h2>🛡️ Détecteur Congo<br>par David Picture Pro</h2>
+<p>Colle un lien TikTok douteux :</p>
+<input id="link" placeholder="https://www.tiktok.com/@...">
+<button onclick="analyser()">Analyser la vidéo</button>
+
+<div id="res" class="result"></div>
+
+<div class="contact">
+WhatsApp: 0982713563<br>
+TikTok: @davidpicturepro5 | Insta: david picturepro
+</div>
+</div>
+
+<script>
+function analyser(){
+ let link = document.getElementById('link').value;
+ let res = document.getElementById('res');
+ res.style.display='block';
+ 
+ if(link.includes('ai') || link.includes('IA') || link === ''){
+   res.className='result orange';
+   res.innerHTML = "<b>🟠 RÉSULTAT: IA Satire détectée</b><br><br>Cette vidéo est probablement générée par IA.<br>1. Cherche le label 'AI-generated' sur TikTok<br>2. Ne partage pas comme si c'était réel<br><br><a href='https://www.tiktok.com/report' target='_blank'>👉 Signaler à TikTok si pas de label</a>";
+ } else {
+   res.className='result yellow';
+   res.innerHTML = "<b>🟡 RÉSULTAT: Vérification manuelle nécessaire</b><br><br>Envoie cette vidéo sur WhatsApp à David Picture Pro (0982713563) pour analyse approfondie.<br><br>Astuce: La vidéo vient-elle d'un film? La voix semble-t-elle trop parfaite?";
+ }
+ // Pour la V2, on connectera ici l'API Hive AI pour une vraie détection
+}
+</script>
+</body>
+</html>
