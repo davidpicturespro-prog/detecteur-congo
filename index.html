@@ -2,8 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>David Picture Pro - Détecteur Congo</title>
 
 <style>
@@ -13,84 +12,94 @@
 
 body {
   font-family: Arial, sans-serif;
-  background: #f0f2f5;
-  padding: 20px;
-  max-width: 500px;
-  margin: auto;
-  color: #222;
+  background: #eef2f7;
+  margin: 0;
+  padding: 18px;
+  color: #172033;
 }
 
 .card {
+  max-width: 520px;
+  margin: 20px auto;
   background: white;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  padding: 22px;
+  border-radius: 18px;
+  box-shadow: 0 5px 20px #00000015;
 }
 
-h2 {
+h1 {
   text-align: center;
-  color: #075dcc;
+  color: #0759c7;
+  font-size: 25px;
 }
 
-input {
-  width: 100%;
-  padding: 14px;
-  border-radius: 10px;
-  border: 2px solid #0077ff;
-  margin: 10px 0;
-  font-size: 15px;
+.subtitle {
+  text-align: center;
+  color: #667085;
 }
 
-button, .video-link {
+label {
+  display: block;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+input[type="file"] {
   display: block;
   width: 100%;
-  padding: 14px;
-  background: #0077ff;
-  color: white;
-  border: none;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid #ccd4e0;
   border-radius: 10px;
-  font-weight: bold;
-  font-size: 16px;
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
+  background: #f8fafc;
 }
 
-.result {
-  margin-top: 20px;
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 14px;
+  border: none;
+  border-radius: 10px;
+  background: #0759c7;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+button:disabled {
+  background: #98a2b3;
+}
+
+video, canvas {
+  display: block;
+  width: 100%;
+  margin-top: 15px;
+  border-radius: 12px;
+  background: #111;
+}
+
+canvas {
+  height: auto;
+}
+
+.panel {
+  margin-top: 18px;
   padding: 15px;
   border-radius: 10px;
-  line-height: 1.6;
-  display: none;
+  background: #fff3cd;
+  line-height: 1.5;
   overflow-wrap: anywhere;
 }
 
-.yellow {
-  background: #fff3cd;
+.hidden {
+  display: none;
 }
 
-.green {
-  background: #d4edda;
-}
-
-.orange {
-  background: #ffe0b2;
-}
-
-.red {
-  background: #f8d7da;
-}
-
-.contact {
-  margin-top: 20px;
-  font-size: 12px;
+.footer {
+  margin-top: 22px;
   text-align: center;
-  color: gray;
-  line-height: 1.8;
-}
-
-h3 {
-  font-size: 17px;
+  color: #667085;
+  font-size: 12px;
 }
 </style>
 </head>
@@ -99,113 +108,185 @@ h3 {
 
 <div class="card">
 
-<h2>🛡️ Détecteur Congo<br>David Picture Pro</h2>
+<h1>🛡️ David Picture Pro</h1>
+<p class="subtitle">Détecteur Congo — Vérification vidéo</p>
 
 <p>
-Colle le lien d'une vidéo TikTok que tu souhaites vérifier.
+Sélectionne une vidéo depuis ton téléphone pour la visionner
+et en extraire une image.
 </p>
 
-<form id="formulaire">
-  <input
-    id="link"
-    type="url"
-    placeholder="https://www.tiktok.com/@.../video/..."
-    aria-label="Lien de la vidéo TikTok"
-    required
-  >
+<label for="videoFile">📁 Choisir une vidéo</label>
+<input
+  type="file"
+  id="videoFile"
+  accept="video/*"
+>
 
-  <button type="submit">🔎 Examiner le lien</button>
-</form>
+<video
+  id="video"
+  controls
+  playsinline
+  class="hidden"
+></video>
 
-<div id="res" class="result" role="status" aria-live="polite"></div>
+<button id="extractBtn" disabled>
+🖼️ Extraire une image
+</button>
 
-<div class="contact">
+<div id="imageArea" class="hidden">
+  <h3>Image extraite</h3>
+  <canvas id="canvas"></canvas>
+
+  <button id="downloadBtn">
+    Télécharger l'image
+  </button>
+</div>
+
+<div id="result" class="panel">
+  <strong>🔎 En attente d'une vidéo</strong>
+  <p>
+    Choisis une vidéo pour commencer.
+    Aucune analyse automatique n'a encore été effectuée.
+  </p>
+</div>
+
+<div class="footer">
   David Picture Pro<br>
-  TikTok : @davidpicturepro5<br>
-  Outil d'aide à la vérification des vidéos
+  L'analyse d'une image seule ne permet pas de prouver
+  qu'une vidéo est authentique ou truquée.
 </div>
 
 </div>
 
 <script>
-const formulaire = document.getElementById("formulaire");
-const champLien = document.getElementById("link");
-const resultat = document.getElementById("res");
+const fileInput = document.getElementById("videoFile");
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const extractBtn = document.getElementById("extractBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+const imageArea = document.getElementById("imageArea");
+const result = document.getElementById("result");
 
-formulaire.addEventListener("submit", function(event) {
-  event.preventDefault();
-  analyser();
+let videoURL = null;
+let imageReady = false;
+
+fileInput.addEventListener("change", function () {
+  const file = fileInput.files[0];
+
+  imageReady = false;
+  extractBtn.disabled = true;
+  imageArea.classList.add("hidden");
+  video.classList.add("hidden");
+
+  if (videoURL) {
+    URL.revokeObjectURL(videoURL);
+    videoURL = null;
+  }
+
+  if (!file) {
+    result.textContent = "Aucune vidéo sélectionnée.";
+    return;
+  }
+
+  if (!file.type.startsWith("video/")) {
+    result.textContent = "Choisis un fichier vidéo valide.";
+    fileInput.value = "";
+    return;
+  }
+
+  videoURL = URL.createObjectURL(file);
+  video.src = videoURL;
+  video.classList.remove("hidden");
+
+  result.innerHTML =
+    "<strong>✅ Vidéo chargée</strong><br>" +
+    "Nom : " + escapeHTML(file.name) + "<br>" +
+    "Taille : " + (file.size / (1024 * 1024)).toFixed(2) +
+    " Mo<br><br>" +
+    "Regarde la vidéo, puis mets-la en pause sur l'image à examiner.";
+
+  video.onloadedmetadata = function () {
+    extractBtn.disabled = false;
+  };
+
+  video.onerror = function () {
+    extractBtn.disabled = true;
+    result.textContent =
+      "Impossible de lire cette vidéo dans le navigateur.";
+  };
 });
 
-function analyser() {
-  const texte = champLien.value.trim();
-
-  resultat.style.display = "block";
-
-  let url;
-
-  try {
-    url = new URL(texte);
-  } catch {
-    resultat.className = "result red";
-    resultat.innerHTML =
-      "<b>❌ Lien invalide</b><br>" +
-      "Colle un lien complet de vidéo TikTok, puis réessaie.";
+extractBtn.addEventListener("click", function () {
+  if (!video.src || !video.videoWidth || video.paused === false) {
+    result.textContent =
+      "Mets d'abord la vidéo en pause sur l'image souhaitée.";
     return;
   }
 
-  const domaine = url.hostname.toLowerCase();
-
-  const domaineAutorise =
-    domaine === "tiktok.com" ||
-    domaine.endsWith(".tiktok.com");
-
-  if (url.protocol !== "https:" || !domaineAutorise) {
-    resultat.className = "result red";
-    resultat.textContent =
-      "❌ Ce lien ne semble pas être un lien TikTok sécurisé. " +
-      "Vérifie son origine avant de continuer.";
+  if (video.readyState < 2) {
+    result.textContent =
+      "Attends que la vidéo soit prête, puis réessaie.";
     return;
   }
 
-  resultat.className = "result yellow";
+  const maxWidth = 900;
+  const scale = Math.min(1, maxWidth / video.videoWidth);
 
-  resultat.innerHTML = `
-    <b>🟡 RÉSULTAT : Authenticité non déterminée</b>
+  canvas.width = Math.round(video.videoWidth * scale);
+  canvas.height = Math.round(video.videoHeight * scale);
 
-    <p>
-      Le lien semble appartenir à TikTok, mais cela ne prouve
-      pas que la vidéo est authentique.
-    </p>
+  const context = canvas.getContext("2d");
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    <h3>🔍 Comment vérifier cette vidéo ?</h3>
+  imageArea.classList.remove("hidden");
+  imageReady = true;
 
-    <ol>
-      <li>Regarde si la vidéo possède une source originale fiable.</li>
-      <li>Vérifie si d'autres sources indépendantes confirment les faits.</li>
-      <li>Observe les éventuelles incohérences entre les lèvres,
-      la voix, les mouvements et l'éclairage.</li>
-      <li>Recherche une éventuelle mention de contenu généré par IA.</li>
-    </ol>
+  result.innerHTML =
+    "<strong>🖼️ Image extraite avec succès</strong><br>" +
+    "L'image est prête à être préparée pour un moteur " +
+    "d'analyse compatible.<br><br>" +
+    "⚠️ Cette version n'a pas encore vérifié si la vidéo " +
+    "a été générée ou modifiée par une IA.";
+});
 
-    <p>
-      <b>Important :</b> ces indices ne suffisent pas, à eux seuls,
-      à prouver qu'une vidéo est fausse ou générée par IA.
-    </p>
+downloadBtn.addEventListener("click", function () {
+  if (!imageReady) return;
 
-    <a
-      class="video-link"
-      href="${url.href}"
-      target="_blank"
-      rel="noopener noreferrer"
-    >▶️ Ouvrir la vidéo TikTok</a>
+  canvas.toBlob(function (blob) {
+    if (!blob) {
+      result.textContent = "Impossible de créer l'image.";
+      return;
+    }
 
-    <p>
-      <b>Conclusion :</b> une analyse technique supplémentaire
-      est nécessaire pour évaluer cette vidéo.
-    </p>
-  `;
+    const link = document.createElement("a");
+    const imageURL = URL.createObjectURL(blob);
+
+    link.href = imageURL;
+    link.download = "image-david-picture-pro.jpg";
+    link.click();
+
+    setTimeout(function () {
+      URL.revokeObjectURL(imageURL);
+    }, 1000);
+  }, "image/jpeg", 0.9);
+});
+
+function escapeHTML(text) {
+  return text.replace(/[&<>"']/g, function (char) {
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[char];
+  });
 }
+
+window.addEventListener("beforeunload", function () {
+  if (videoURL) URL.revokeObjectURL(videoURL);
+});
 </script>
 
 </body>
