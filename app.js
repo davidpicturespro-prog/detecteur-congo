@@ -52,12 +52,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     showMessage(
-      "Lien TikTok reconnu ! Le moteur d'analyse réel reste à connecter. " +
-      "Nous n'avons pas encore vérifié si cette vidéo est vraie ou fausse."
+      "Lien TikTok reconnu ! Aucune analyse d'authenticité " +
+      "n'a encore été effectuée. Importe une vidéo pour consulter " +
+      "ses informations techniques."
     );
   });
 
-  // Vérification du fichier importé
+  // Vérification du fichier vidéo
   if (fileInput && fileInfo) {
     fileInput.addEventListener("change", function () {
       const file = fileInput.files[0];
@@ -77,6 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
         fileInput.value = "";
         fileInfo.textContent =
           "Format non accepté. Choisis MP4, WebM ou MOV.";
+        showMessage("Choisis un fichier MP4, WebM ou MOV.");
         return;
       }
 
@@ -84,19 +86,58 @@ document.addEventListener("DOMContentLoaded", function () {
         fileInput.value = "";
         fileInfo.textContent =
           "Fichier trop volumineux. Maximum : 50 Mo.";
+        showMessage("La vidéo dépasse la limite de 50 Mo.");
         return;
       }
 
-      fileInfo.textContent =
-        file.name + " — " +
-        (file.size / (1024 * 1024)).toFixed(1) + " Mo";
+      const taille = (file.size / (1024 * 1024)).toFixed(1);
+      fileInfo.textContent = file.name + " — " + taille + " Mo";
 
-      showMessage(
-        "Vidéo sélectionnée. L'analyse réelle n'est pas encore activée."
-      );
+      // Lire les métadonnées localement dans le navigateur
+      const video = document.createElement("video");
+      const videoUrl = URL.createObjectURL(file);
+      video.preload = "metadata";
+
+      video.onloadedmetadata = function () {
+        const duree = Number.isFinite(video.duration)
+          ? Math.round(video.duration)
+          : null;
+
+        const largeur = video.videoWidth;
+        const hauteur = video.videoHeight;
+
+        const informations = [
+          "Vidéo chargée : " + file.name,
+          "Taille : " + taille + " Mo",
+          "Résolution : " +
+            (largeur && hauteur
+              ? largeur + " × " + hauteur + " pixels"
+              : "indisponible"),
+          "Durée : " +
+            (duree !== null
+              ? Math.floor(duree / 60) + " min " +
+                (duree % 60) + " s"
+              : "indisponible"),
+          "",
+          "Ces informations décrivent le fichier, mais ne prouvent " +
+            "pas son authenticité ni une génération par IA."
+        ];
+
+        showMessage(informations.join("\n"));
+        URL.revokeObjectURL(videoUrl);
+      };
+
+      video.onerror = function () {
+        showMessage(
+          "Le fichier est accepté, mais ses métadonnées n'ont pas pu " +
+          "être lues. Essaie une autre vidéo."
+        );
+        URL.revokeObjectURL(videoUrl);
+      };
+
+      video.src = videoUrl;
     });
   }
 
   console.log("TikTok Fake Detector : JavaScript chargé.");
 });
-
