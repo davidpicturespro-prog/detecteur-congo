@@ -21,8 +21,8 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
-  // Vérification du lien TikTok
-  form.addEventListener("submit", function (event) {
+  // Vérifier le lien et envoyer la demande au serveur
+  form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
     const link = urlInput.value.trim();
@@ -51,14 +51,57 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    showMessage(
-      "Lien TikTok reconnu ! Aucune analyse d'authenticité " +
-      "n'a encore été effectuée. Importe une vidéo pour consulter " +
-      "ses informations techniques."
+    const submitButton = form.querySelector(
+      'button[type="submit"], input[type="submit"]'
     );
+
+    if (submitButton) submitButton.disabled = true;
+
+    showMessage("Connexion au serveur en cours...");
+
+    try {
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ url: link })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Le serveur a rencontré une erreur."
+        );
+      }
+
+      if (data.status === "not_connected") {
+        showMessage(
+          "Le serveur fonctionne !\n\n" +
+          "Lien TikTok reconnu : " + link + "\n\n" +
+          "Le moteur d'analyse IA n'est pas encore connecté. " +
+          "La vidéo n'a donc pas été déclarée vraie ou fausse."
+        );
+        return;
+      }
+
+      showMessage(
+        data.message ||
+        "Réponse reçue du serveur. Aucune conclusion ne doit être tirée sans analyse réelle."
+      );
+    } catch (error) {
+      console.error("Erreur API :", error);
+      showMessage(
+        "Impossible de contacter le serveur. Vérifie ta connexion " +
+        "Internet et réessaie."
+      );
+    } finally {
+      if (submitButton) submitButton.disabled = false;
+    }
   });
 
-  // Vérification du fichier vidéo
+  // Lire les informations techniques du fichier vidéo
   if (fileInput && fileInfo) {
     fileInput.addEventListener("change", function () {
       const file = fileInput.files[0];
@@ -93,7 +136,6 @@ document.addEventListener("DOMContentLoaded", function () {
       const taille = (file.size / (1024 * 1024)).toFixed(1);
       fileInfo.textContent = file.name + " — " + taille + " Mo";
 
-      // Lire les métadonnées localement dans le navigateur
       const video = document.createElement("video");
       const videoUrl = URL.createObjectURL(file);
       video.preload = "metadata";
@@ -119,8 +161,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 (duree % 60) + " s"
               : "indisponible"),
           "",
-          "Ces informations décrivent le fichier, mais ne prouvent " +
-            "pas son authenticité ni une génération par IA."
+          "Ces informations techniques ne prouvent pas " +
+          "l'authenticité de la vidéo."
         ];
 
         showMessage(informations.join("\n"));
@@ -129,8 +171,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       video.onerror = function () {
         showMessage(
-          "Le fichier est accepté, mais ses métadonnées n'ont pas pu " +
-          "être lues. Essaie une autre vidéo."
+          "Les métadonnées de cette vidéo n'ont pas pu être lues."
         );
         URL.revokeObjectURL(videoUrl);
       };
