@@ -1,293 +1,82 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>David Picture Pro - Détecteur Congo</title>
-
-<style>
-* {
-  box-sizing: border-box;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  background: #eef2f7;
-  margin: 0;
-  padding: 18px;
-  color: #172033;
-}
-
-.card {
-  max-width: 520px;
-  margin: 20px auto;
-  background: white;
-  padding: 22px;
-  border-radius: 18px;
-  box-shadow: 0 5px 20px #00000015;
-}
-
-h1 {
-  text-align: center;
-  color: #0759c7;
-  font-size: 25px;
-}
-
-.subtitle {
-  text-align: center;
-  color: #667085;
-}
-
-label {
-  display: block;
-  font-weight: bold;
-  margin-top: 20px;
-}
-
-input[type="file"] {
-  display: block;
-  width: 100%;
-  margin-top: 10px;
-  padding: 12px;
-  border: 1px solid #ccd4e0;
-  border-radius: 10px;
-  background: #f8fafc;
-}
-
-button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 14px;
-  border: none;
-  border-radius: 10px;
-  background: #0759c7;
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-button:disabled {
-  background: #98a2b3;
-}
-
-video, canvas {
-  display: block;
-  width: 100%;
-  margin-top: 15px;
-  border-radius: 12px;
-  background: #111;
-}
-
-canvas {
-  height: auto;
-}
-
-.panel {
-  margin-top: 18px;
-  padding: 15px;
-  border-radius: 10px;
-  background: #fff3cd;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}
-
-.hidden {
-  display: none;
-}
-
-.footer {
-  margin-top: 22px;
-  text-align: center;
-  color: #667085;
-  font-size: 12px;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Vérifiez les vidéos suspectes et les informations virales avec TikTok Fake Detector.">
+  <title>TikTok Fake Detector</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+  <header class="topbar">
+    <a class="logo" href="#">TFD<span>.</span></a>
+    <span class="tag">VÉRIFICATION VIDÉO</span>
+  </header>
 
-<div class="card">
+  <main>
+    <section class="hero">
+      <div class="eyebrow">● INFORMATION • CONTEXTE • IA</div>
+      <h1>Une vidéo virale ?<br><span>Vérifions les faits.</span></h1>
+      <p>Analysez les indices d'une vidéo TikTok, recherchez son contexte et consultez les sources avant de la partager.</p>
+    </section>
 
-<h1>🛡️ David Picture Pro</h1>
-<p class="subtitle">Détecteur Congo — Vérification vidéo</p>
+    <section class="panel">
+      <h2>Analyser une vidéo</h2>
+      <p class="muted">Collez le lien public d'une vidéo TikTok ou choisissez un fichier vidéo.</p>
 
-<p>
-Sélectionne une vidéo depuis ton téléphone pour la visionner
-et en extraire une image.
-</p>
+      <form id="analysis-form">
+        <label for="video-url">Lien TikTok</label>
+        <div class="url-row">
+          <input id="video-url" type="url"
+            placeholder="https://www.tiktok.com/..." autocomplete="url">
+          <button type="submit" id="analyze-btn">Vérifier</button>
+        </div>
 
-<label for="videoFile">📁 Choisir une vidéo</label>
-<input
-  type="file"
-  id="videoFile"
-  accept="video/*"
->
+        <div class="separator"><span>OU</span></div>
 
-<video
-  id="video"
-  controls
-  playsinline
-  class="hidden"
-></video>
+        <label class="upload-box" for="video-file">
+          <span class="upload-icon">↑</span>
+          <strong>Importer une vidéo</strong>
+          <span class="muted">MP4, WebM ou MOV — 50 Mo maximum</span>
+        </label>
+        <input id="video-file" type="file"
+          accept="video/mp4,video/webm,video/quicktime" hidden>
 
-<button id="extractBtn" disabled>
-🖼️ Extraire une image
-</button>
+        <p id="file-info" class="muted" aria-live="polite">Aucun fichier sélectionné.</p>
+      </form>
 
-<div id="imageArea" class="hidden">
-  <h3>Image extraite</h3>
-  <canvas id="canvas"></canvas>
+      <div id="result" class="result" aria-live="polite" hidden>
+        <h3>Préparation de la vérification</h3>
+        <p id="result-message"></p>
+      </div>
+    </section>
 
-  <button id="downloadBtn">
-    Télécharger l'image
-  </button>
-</div>
+    <section class="features">
+      <article class="feature">
+        <div class="feature-icon">01</div>
+        <h3>Indices d'IA</h3>
+        <p>Préparer l'examen des images, des mouvements et du son.</p>
+      </article>
+      <article class="feature">
+        <div class="feature-icon">02</div>
+        <h3>Sources fiables</h3>
+        <p>Rechercher des publications fiables pour vérifier le contexte.</p>
+      </article>
+      <article class="feature">
+        <div class="feature-icon">03</div>
+        <h3>Historique</h3>
+        <p>Nous ajouterons ensuite un historique personnel des analyses.</p>
+      </article>
+    </section>
 
-<div id="result" class="panel">
-  <strong>🔎 En attente d'une vidéo</strong>
-  <p>
-    Choisis une vidéo pour commencer.
-    Aucune analyse automatique n'a encore été effectuée.
-  </p>
-</div>
+    <p class="disclaimer">
+      Important : cette interface ne détermine pas encore si une vidéo est
+      vraie ou fausse. Une conclusion nécessite des vérifications réelles.
+    </p>
+  </main>
 
-<div class="footer">
-  David Picture Pro<br>
-  L'analyse d'une image seule ne permet pas de prouver
-  qu'une vidéo est authentique ou truquée.
-</div>
-
-</div>
-
-<script>
-const fileInput = document.getElementById("videoFile");
-const video = document.getElementById("video");
-const canvas = document.getElementById("canvas");
-const extractBtn = document.getElementById("extractBtn");
-const downloadBtn = document.getElementById("downloadBtn");
-const imageArea = document.getElementById("imageArea");
-const result = document.getElementById("result");
-
-let videoURL = null;
-let imageReady = false;
-
-fileInput.addEventListener("change", function () {
-  const file = fileInput.files[0];
-
-  imageReady = false;
-  extractBtn.disabled = true;
-  imageArea.classList.add("hidden");
-  video.classList.add("hidden");
-
-  if (videoURL) {
-    URL.revokeObjectURL(videoURL);
-    videoURL = null;
-  }
-
-  if (!file) {
-    result.textContent = "Aucune vidéo sélectionnée.";
-    return;
-  }
-
-  if (!file.type.startsWith("video/")) {
-    result.textContent = "Choisis un fichier vidéo valide.";
-    fileInput.value = "";
-    return;
-  }
-
-  videoURL = URL.createObjectURL(file);
-  video.src = videoURL;
-  video.classList.remove("hidden");
-
-  result.innerHTML =
-    "<strong>✅ Vidéo chargée</strong><br>" +
-    "Nom : " + escapeHTML(file.name) + "<br>" +
-    "Taille : " + (file.size / (1024 * 1024)).toFixed(2) +
-    " Mo<br><br>" +
-    "Regarde la vidéo, puis mets-la en pause sur l'image à examiner.";
-
-  video.onloadedmetadata = function () {
-    extractBtn.disabled = false;
-  };
-
-  video.onerror = function () {
-    extractBtn.disabled = true;
-    result.textContent =
-      "Impossible de lire cette vidéo dans le navigateur.";
-  };
-});
-
-extractBtn.addEventListener("click", function () {
-  if (!video.src || !video.videoWidth || video.paused === false) {
-    result.textContent =
-      "Mets d'abord la vidéo en pause sur l'image souhaitée.";
-    return;
-  }
-
-  if (video.readyState < 2) {
-    result.textContent =
-      "Attends que la vidéo soit prête, puis réessaie.";
-    return;
-  }
-
-  const maxWidth = 900;
-  const scale = Math.min(1, maxWidth / video.videoWidth);
-
-  canvas.width = Math.round(video.videoWidth * scale);
-  canvas.height = Math.round(video.videoHeight * scale);
-
-  const context = canvas.getContext("2d");
-  context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-  imageArea.classList.remove("hidden");
-  imageReady = true;
-
-  result.innerHTML =
-    "<strong>🖼️ Image extraite avec succès</strong><br>" +
-    "L'image est prête à être préparée pour un moteur " +
-    "d'analyse compatible.<br><br>" +
-    "⚠️ Cette version n'a pas encore vérifié si la vidéo " +
-    "a été générée ou modifiée par une IA.";
-});
-
-downloadBtn.addEventListener("click", function () {
-  if (!imageReady) return;
-
-  canvas.toBlob(function (blob) {
-    if (!blob) {
-      result.textContent = "Impossible de créer l'image.";
-      return;
-    }
-
-    const link = document.createElement("a");
-    const imageURL = URL.createObjectURL(blob);
-
-    link.href = imageURL;
-    link.download = "image-david-picture-pro.jpg";
-    link.click();
-
-    setTimeout(function () {
-      URL.revokeObjectURL(imageURL);
-    }, 1000);
-  }, "image/jpeg", 0.9);
-});
-
-function escapeHTML(text) {
-  return text.replace(/[&<>"']/g, function (char) {
-    return {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    }[char];
-  });
-}
-
-window.addEventListener("beforeunload", function () {
-  if (videoURL) URL.revokeObjectURL(videoURL);
-});
-</script>
-
+  <footer>TFD · TikTok Fake Detector · Vérifier avant de partager.</footer>
+  <script src="app.js"></script>
 </body>
 </html>
